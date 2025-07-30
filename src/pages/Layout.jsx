@@ -20,7 +20,7 @@ const Layout = () => {
       </nav>
       <div className='flex-1 w-full  h-[calc(100vh - 60px)] flex'>
         <Sidebar sidebar={sidebar} setSidebar={setSidebar} />
-        <div className='flex-1 bg-gray-300'>
+        <div className='flex-1 bg-slate-100'>
           <Outlet />
         </div >
       </div>

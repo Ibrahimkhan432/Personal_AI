@@ -24,7 +24,7 @@ const Sidebar = ({ sidebar, setSidebar }) => {
 
 
     return (
-        <div className={`w-60  bg-white border-r border-gray-600 flex flex-col justify-between items-center max:sm-:absolute top-14 bottom-0 ${sidebar ? 'translate-x-0' : 'max-sm:-translate-x-full'} transition-all duration-300 ease-in-out `}>
+        <div className={`w-60  bg-white border-r border-gray-100 flex flex-col justify-between items-center max:sm-:absolute top-14 bottom-0 ${sidebar ? 'translate-x-0' : 'max-sm:-translate-x-full'} transition-all duration-300 ease-in-out `}>
             <div className=' flex flex-col item-center  p-4 h-full my-7 w-full font-medium'>
                 <img src={user?.imageUrl} alt='avatar' className='w-13 mx-auto cursor-pointer mb-4 rounded-full'
                     onClick={() => navigate('/')} />
