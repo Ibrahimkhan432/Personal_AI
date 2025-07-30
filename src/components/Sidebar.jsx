@@ -36,7 +36,7 @@ const Sidebar = ({ sidebar, setSidebar }) => {
                             to={to}
                             end={to === '/ai'}
                             onClick={() => setSidebar(false)}
-                            className={({ isActive }) => `flex items-center gap-2 p-2 rounded-md ${isActive ? 'bg-gradient-to-r from-[#3C81F6] to-[#9234EA] text-white' : ''}`}
+                            className={({ isActive }) => `flex items-center gap-2 p-2 rounded-md ${isActive ? 'bg-gradient-to-r from-[#226BFF] to-[#65ADFF] text-white' : ''}`}
                         >
                             {({ isActive }) => (
                                 <>
