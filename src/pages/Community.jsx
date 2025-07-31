@@ -1,9 +1,12 @@
 import React from 'react'
 
-function Community() {
+const Community = () => {
   return (
-    <div>
-      Community
+    <div className='flex-1 h-full flex flex-col gap-4 p-6'>
+      Creations
+      <div className='bg-white h-full w-full rounded'>
+
+      </div>
     </div>
   )
 }
