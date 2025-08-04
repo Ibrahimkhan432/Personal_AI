@@ -4,7 +4,6 @@ import "dotenv/config"
 import { clerkMiddleware, requireAuth } from '@clerk/express'
 import aiRouter from "./routes/aiRoutes.js"
 import connectCloudinary from "./configs/cloudinary.js"
-import morgan from "morgan"
 const app = express();
 
 await connectCloudinary();
@@ -14,7 +13,6 @@ app.use(express.json())
 app.use(clerkMiddleware())
 
 app.get('/', (req, res) => res.send('Server is running'))
-app.use(morgan("dev"))
 app.use(requireAuth())
 
 app.use('/api/ai', aiRouter)
