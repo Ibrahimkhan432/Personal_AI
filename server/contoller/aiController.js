@@ -157,3 +157,32 @@ export const removeImageBackground = async (req, res) => {
     }
 
 }
+export const removeImageObject = async (req, res) => {
+    try {
+        const { userId } = req.auth();
+        console.log(userId);
+        const { image } = req.file;
+        const { object } = req.body;
+        const plan = req.plan;
+
+        if (plan !== 'premium') {
+            return res.json({ success: false, message: 'you have reached your limit , please upgrade your package to continue' })
+        }
+
+        const { public_id } = await cloudinary.uploader.upload(image.path)
+
+        const imageurl = cloudinary.url(public_id, {
+            transformation: [{ effect: `gen_remove:${object}` }],
+            resource_type: 'image'
+
+        })
+        await sql`INSERT INTO creations (user_id,prompt,content,type)
+        VALUES (${userId},${`Removed ${object} from image`},${imageurl},'image')`;
+
+        res.json({ success: true, content: imageurl })
+    } catch (error) {
+        console.log(error.message)
+        res.json({ success: false, message: error.message })
+    }
+
+}
