@@ -2,9 +2,10 @@ import express from "express"
 import { auth } from "../middleware/auth.js";
 import { generateArticle, generateBlogTitle, generateImage, removeImageBackground, removeImageObject, resumeReview } from "../contoller/aiController.js";
 import { upload } from "../configs/multer.js";
+import { requireAuth } from "@clerk/express";
 
 const aiRouter = express.Router();
-
+aiRouter.use(requireAuth())
 aiRouter.post('/generate-article', auth, generateArticle)
 aiRouter.post('/generate-blogTitle', auth, generateBlogTitle)
 aiRouter.post('/generate-image', auth, generateImage)

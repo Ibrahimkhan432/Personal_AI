@@ -22,6 +22,7 @@ export const auth = async (req, res, next) => {
         req.plan = hasPermissionPlan ? 'premium' : 'free'
         next()
     } catch (error) {
+        console.log(error)
         res.json({ success: false, message: error.message })
     }
 

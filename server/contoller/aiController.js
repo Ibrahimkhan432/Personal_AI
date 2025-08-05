@@ -5,6 +5,7 @@ import axios from "axios";
 import { v2 as cloudinary } from "cloudinary"
 import fs from 'fs';
 import pdf from 'pdf-parse/lib/pdf-parse.js'
+import FormData from 'form-data';
 
 const AI = new OpenAI({
     apiKey: process.env.GEMINI_API_KEY,
@@ -110,6 +111,7 @@ export const generateImage = async (req, res) => {
         const { data } = await axios.post('https://clipdrop-api.co/text-to-image/v1', formData, {
             headers: {
                 'x-api-key': process.env.CLIP_DROP_API_KEY,
+                ...formData.getHeaders()
             },
             responseType: "arraybuffer"
         })
