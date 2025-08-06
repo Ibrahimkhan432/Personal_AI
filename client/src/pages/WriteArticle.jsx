@@ -1,7 +1,10 @@
+import { useAuth } from '@clerk/clerk-react'
 import { Edit, Sparkles } from 'lucide-react'
 import React, { useState } from 'react'
-
-
+import toast from 'react-hot-toast'
+import axios from 'axios';
+import Markdown from 'react-markdown';
+axios.defaults.baseURL = import.meta.env.VITE_BASE_URL
 
 function WriteArticle() {
   const articleLength = [
@@ -12,9 +15,35 @@ function WriteArticle() {
 
   const [selectedLength, setSelectedLength] = useState(articleLength[0])
   const [input, setInput] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [content, setContent] = useState('')
 
+  const { getToken } = useAuth()
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+    try {
+      setLoading(true)
+      const prompt = `Write an article about ${input} in ${selectedLength.length} words.`
+      const { data } = await axios.post('/api/ai/generate-article', { prompt, length: selectedLength.length }, {
+        headers: {
+          Authorization: `Bearer ${await getToken()}`
+        }
+      });
+      console.log(data)
+      if (data.success) {
+        setContent(data.content)
+        setLoading(false)
+      }
+      else {
+        toast.error(data.message);
+        console.log(data.message);
+        setLoading(false)
+      }
+
+    } catch (error) {
+      toast.error(error.message);
+    }
+    setLoading(false)
   }
 
   return (
@@ -43,8 +72,14 @@ function WriteArticle() {
           )}
         </div>
         <br />
-        <button className='flex w-full p-2 bg-gradient-to-r from-[#226BFF] to-[#65ADFF] text-white rounded-lg cursor-pointer  justify-center gap-2'>
-          <Edit className='w-5' />
+        <button
+          disabled={loading}
+          className='flex w-full p-2 bg-gradient-to-r from-[#226BFF] to-[#65ADFF] text-white rounded-lg cursor-pointer  justify-center gap-2'>
+          {loading ? <span className='animate-spin inline-block w-4 h-4 border-[3px] border-current border-t-transparent text-white rounded-full'>
+          </span>
+            :
+            <Edit className='w-5' />
+          }
           Generate Article
         </button>
       </form >
@@ -54,12 +89,27 @@ function WriteArticle() {
           <Edit className='w-5 h-5 text-[#4A7AFF]' />
           <h1 className='text-xl font-semibold'>Generated Article</h1>
         </div>
-        <div className='text-sm text-gray-600 flex-1 flex justify-center items-center'>
-          <div className='text-sm flex flex-col items-center gap-5 text-gray-400'>
-            <Edit className='w-9 h-9'/>
-            <p className='text-center'>Enter a topic and click "Generate Article" to get started!</p>
+
+        {!content ? (
+          <div className='text-sm text-gray-600 flex-1 flex justify-center items-center'>
+            <div className='text-sm flex flex-col items-center gap-5 text-gray-400'>
+              <Edit className='w-9 h-9' />
+              <p className='text-center'>Enter a topic and click "Generate Article" to get started!</p>
+            </div>
           </div>
-        </div>
+
+        ) : (
+
+          <div className='text-sm text-gray-600 flex-1 flex justify-center items-center'>
+            <div className='reset-tw text-sm flex flex-col items-center gap-5 text-gray-400'>
+              <Markdown>
+                {content}
+              </Markdown>
+            </div>
+          </div>
+        )}
+
+
       </div>
     </div >
   )

@@ -135,7 +135,7 @@ export const removeImageBackground = async (req, res) => {
     try {
         const { userId } = req.auth();
         console.log(userId);
-        const { image } = req.file;
+        const image = req.file;
         const plan = req.plan;
 
         if (plan !== 'premium') {
@@ -165,7 +165,7 @@ export const removeImageObject = async (req, res) => {
     try {
         const { userId } = req.auth();
         console.log(userId);
-        const { image } = req.file;
+        const image = req.file;
         const { object } = req.body;
         const plan = req.plan;
 
@@ -203,7 +203,7 @@ export const resumeReview = async (req, res) => {
         }
 
         if (resume.size > 5 * 1024 * 1024) {
-            return res.json({success:false,message:"Resume file size allowed only (5MB)."})
+            return res.json({ success: false, message: "Resume file size allowed only (5MB)." })
         }
 
         const dataBuffer = fs.readFileSync(resume.path)
@@ -211,7 +211,7 @@ export const resumeReview = async (req, res) => {
 
         const prompt = `Review the following resume and provide feedback to its strengths and improvement. Resume Contant:\n\n${pdfData.text}`
 
-     // gemini api
+        // gemini api
         const response = await AI.chat.completions.create({
             model: "gemini-2.0-flash",
             messages: [

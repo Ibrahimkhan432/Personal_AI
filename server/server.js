@@ -13,10 +13,8 @@ app.use(express.json())
 app.use(clerkMiddleware())
 
 app.get('/', (req, res) => res.send('Server is running'))
-app.use(requireAuth())
 
 app.use('/api/ai', aiRouter)
-
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
