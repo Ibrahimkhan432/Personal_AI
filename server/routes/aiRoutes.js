@@ -8,7 +8,7 @@ const aiRouter = express.Router();
 aiRouter.use(requireAuth())
 aiRouter.post('/generate-article', auth, generateArticle)
 aiRouter.post('/generate-blogTitle', auth, generateBlogTitle)
-aiRouter.post('/generate-image', auth, generateImage)
+aiRouter.post('/generate-image',auth,  generateImage)
 aiRouter.post('/remove-image-background', upload.single('image'), auth, removeImageBackground)
 aiRouter.post('/remove-image-object', upload.single('image'), auth, removeImageObject)
 aiRouter.post('/resume-review', upload.single('resume'), auth, resumeReview)

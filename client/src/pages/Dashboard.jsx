@@ -1,14 +1,36 @@
 import React, { useEffect, useState } from 'react'
 import { dummyCreationData } from '../assets/assets'
-import { Gem, Sparkles } from 'lucide-react'
-import { Protect } from '@clerk/clerk-react'
+import { Gem, Loader2, Sparkles } from 'lucide-react'
+import { Protect, useAuth } from '@clerk/clerk-react'
 import CreationItem from '../components/CreationItem'
+import axios from 'axios'
+import { toast } from 'react-hot-toast'
 const Dashboard = () => {
 
   const [creations, setCreations] = useState([])
+  const [loading, setLoading] = useState(false)
+  const { getToken } = useAuth()
 
-  const getDashboardData = () => {
-    setCreations(dummyCreationData)
+  const getDashboardData = async () => {
+    try {
+      setLoading(true)
+      const { data } = await axios.get('/api/user/get-user-creations', {
+        headers: {
+          Authorization: `Bearer ${await getToken()}`
+        }
+      })
+      if (data.success) {
+        setCreations(data.creations)
+      }
+      else {
+        console.log(data.message)
+        toast.error(data.message)
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error(error.message)
+    }
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -42,11 +64,17 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      <div className='space-y-6 mt-6'>
-        <h2 className='text-xl font-semibold mt-6 mb-4'>Recent Creations</h2>
-        {creations.map((item) => <CreationItem key={item.id} item={item} className='bg-white p-4 rounded-lg shadow-md border border-gray-200' />
-        )}
-      </div>
+      {loading ? (
+        <div className='flex justify-center items-center h-full'>
+          <Loader2 className='w-8 h-8 animate-spin' />
+        </div>
+      ) : (
+        <div className='space-y-6 mt-6'>
+          <h2 className='text-xl font-semibold mt-6 mb-4'>Recent Creations</h2>
+          {creations.map((item) => <CreationItem key={item.id} item={item} className='bg-white p-4 rounded-lg shadow-md border border-gray-200' />
+          )}
+        </div>
+      )}
     </div>
   )
 }

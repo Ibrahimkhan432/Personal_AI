@@ -95,6 +95,7 @@ export const generateBlogTitle = async (req, res) => {
 
 }
 export const generateImage = async (req, res) => {
+    console.log("generateImage hit", { path: req.path, method: req.method, authHeader: !!req.headers.authorization });
     try {
         const { userId } = req.auth();
         console.log(userId);
@@ -111,7 +112,6 @@ export const generateImage = async (req, res) => {
         const { data } = await axios.post('https://clipdrop-api.co/text-to-image/v1', formData, {
             headers: {
                 'x-api-key': process.env.CLIP_DROP_API_KEY,
-                ...formData.getHeaders()
             },
             responseType: "arraybuffer"
         })
