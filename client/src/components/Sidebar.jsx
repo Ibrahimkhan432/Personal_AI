@@ -22,20 +22,22 @@ const Sidebar = ({ sidebar, setSidebar }) => {
 
   return (
     <div
-      className={`w-64 bg-gradient-to-b from-slate-50 to-white border-r border-slate-200/60 flex flex-col justify-between items-center max-sm:absolute top-14 bottom-0 shadow-xl ${sidebar ? "translate-x-0" : "max-sm:-translate-x-full"} transition-all duration-300 ease-in-out backdrop-blur-sm`}
+      className={`w-64 bg-gradient-to-b from-slate-50 to-white border-r border-slate-200/60 flex flex-col justify-between max-sm:absolute top-14 bottom-0 shadow-xl ${sidebar ? "translate-x-0" : "max-sm:-translate-x-full"} transition-all duration-300 ease-in-out backdrop-blur-sm`}
     >
+      {/* Top: User Info + Nav Links */}
       <div className="flex flex-col items-center p-6 h-full w-full">
+        {/* User Avatar & Name */}
         <div className="flex flex-col items-center mb-8">
           <div className="relative group">
             <img
               src={user?.imageUrl || "/placeholder.svg"}
               alt="avatar"
-              className="w-16 h-16 rounded-full cursor-pointer border-3 border-white shadow-lg group-hover:shadow-xl transition-all duration-200"
+              className="w-16 h-16 rounded-full cursor-pointer border-2 border-white shadow-lg group-hover:shadow-xl transition-all duration-200"
               onClick={() => navigate("/")}
             />
-            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-blue-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
           </div>
-          <h1 className="mt-3 text-slate-800 font-semibold text-lg">{user?.fullName}</h1>
+          <h1 className="mt-3 text-slate-800 font-semibold text-lg truncate">{user?.fullName}</h1>
           <div className="mt-1 px-3 py-1 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full">
             <span className="text-xs font-medium text-slate-600">
               <Protect plan="Premium" fallback="Free Plan">
@@ -45,8 +47,9 @@ const Sidebar = ({ sidebar, setSidebar }) => {
           </div>
         </div>
 
-        <nav className="flex flex-col gap-1 w-full px-3">
-          {NavLinks?.map(({ to, label, Icon }) => (
+        {/* Navigation Links */}
+        <nav className="flex flex-col gap-2 w-full px-3">
+          {NavLinks.map(({ to, label, Icon }) => (
             <NavLink
               key={to}
               to={to}
@@ -63,7 +66,9 @@ const Sidebar = ({ sidebar, setSidebar }) => {
               {({ isActive }) => (
                 <>
                   <Icon
-                    className={`w-5 h-5 transition-transform duration-200 ${isActive ? "text-white" : "group-hover:scale-110"}`}
+                    className={`w-5 h-5 transition-transform duration-200 ${
+                      isActive ? "text-white" : "group-hover:scale-110"
+                    }`}
                   />
                   <span className="text-sm font-medium">{label}</span>
                 </>
@@ -73,6 +78,7 @@ const Sidebar = ({ sidebar, setSidebar }) => {
         </nav>
       </div>
 
+      {/* Bottom: Profile Card + Logout */}
       <div className="w-full p-4 border-t border-slate-200/60 bg-gradient-to-r from-slate-50/50 to-white/50">
         <div
           className="flex items-center gap-3 p-3 rounded-xl bg-white/60 backdrop-blur-sm border border-slate-200/40 hover:bg-white/80 transition-all duration-200 cursor-pointer group"
