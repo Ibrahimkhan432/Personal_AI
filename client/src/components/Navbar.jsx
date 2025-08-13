@@ -12,10 +12,13 @@ const Navbar = () => {
 
 
     return (
-        <div className="fixed z-5 w-full backdrop-blur-2xl flex justify-between items-center py-3 px-4 sm:px-20 xl:px-32">
-            <img src={assets.logo} alt='' className='w-32 sm:w-44 cursor-pointer'
+        <div className=" z-5 w-full backdrop-blur-2xl flex justify-between items-center py-3 px-4 sm:px-20 xl:px-32">
+ <h1 
+                className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-primary via-pink-500 to-purple-500 bg-clip-text text-transparent cursor-pointer tracking-wide"
                 onClick={() => navigate('/')}
-            />
+            >
+                PersonalAi
+            </h1>
 
             {
                 user ? <UserButton /> : (

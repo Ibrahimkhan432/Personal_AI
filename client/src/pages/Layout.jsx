@@ -11,7 +11,12 @@ const Layout = () => {
   return user ? (
     <div className='flex flex-col justify-start items-start h-screen '>
       <nav className='w-full min-h-14 flex items-center justify-between px-8  border-b border-gray-200'>
-        <img src={assets.logo} alt='logo' onClick={() => Navigate('/')} />
+        <h1
+          className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-primary via-pink-500 to-purple-500 bg-clip-text text-transparent cursor-pointer tracking-wide"
+          onClick={() => Navigate('/')}
+        >
+          PersonalAi
+        </h1>
         {
           sidebar ? <X className='w-6 h-6 text-gray-600 sm:hidden' onClick={() => setSidebar(false)} /> : (
             <Menu className='w-6 h-6 text-gray-600 sm:hidden' onClick={() => setSidebar(true)} />
