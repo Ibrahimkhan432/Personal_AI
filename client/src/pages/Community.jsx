@@ -68,16 +68,19 @@ const Community = () => {
 
 
   return !loading ? (
-    <div className='flex-1 h-full flex flex-col gap-4 p-6'>
-      <h1 className='p-2 text-xl font-semibold text-slate-700'>Creations</h1>
-      <div className="bg-white w-full rounded-xl overflow-y-scroll p-4 h-full">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-          {creations.filter(creation => creation.type === "image").map((creation, index) => (
-            <div
-              key={index}
-              className="relative inline-block w-full h-full overflow-hidden rounded-lg shadow-md cursor-pointer group"
-            >
-              {creation.type === "image" && (
+    <div className='flex-1 h-full flex flex-col gap-6 p-6'>
+      <h1 className='text-2xl font-semibold text-slate-700 mb-4'>Creations</h1>
+
+      <div className="bg-white w-full rounded-xl shadow-md p-4 overflow-y-auto h-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+          {creations
+            .filter(creation => creation.type === "image")
+            .map((creation, index) => (
+              <div
+                key={index}
+                className="relative w-full h-64 overflow-hidden rounded-xl shadow-lg cursor-pointer group"
+              >
+                {/* Image */}
                 <img
                   src={creation.content}
                   alt={creation.prompt}
@@ -88,35 +91,39 @@ const Community = () => {
                     e.target.nextSibling.style.display = 'flex';
                   }}
                 />
-              )}
-              {creation.type === "image" && (
-                <div 
-                  className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm hidden"
+
+                {/* Placeholder if image fails */}
+                <div
+                  className="absolute inset-0 bg-gray-200 flex items-center justify-center text-gray-500 text-sm hidden"
                   style={{ display: 'none' }}
                 >
                   Image not available
                 </div>
-              )}
-              <div className='absolute bottom-0 top-0 right-0 flex gap-2 items-end justify-end group-hover:justify-between p-3 group-hover:bg-gradient-to-b from-transparent to-black/90 text-white rounded-lg'>
-                <p className='text-sm hidden group-hover:block'>{creation.prompt}</p>
-                <div className='flex gap-1 items-center'>
-                  <p>{creation.likes?.length || 0}</p>
-                  <Heart
-                    onClick={() => imageLikeToggle(creation.id)}
-                    disabled={loading}
-                    className={`min-w-5 h-5 hover:scale-110 cursor-pointer${creation.likes?.includes(user.id) ? 'fill-red-500 text-red-600' : 'text-white'}`} />
+
+                {/* Overlay on hover */}
+                <div className='absolute inset-0 flex flex-col justify-between p-3 bg-gradient-to-b from-transparent to-black/70 text-white rounded-xl opacity-0 group-hover:opacity-100 transition'>
+                  <p className='text-sm'>{creation.prompt}</p>
+                  <div className='flex gap-2 items-center justify-end'>
+                    <p>{creation.likes?.length || 0}</p>
+                    <Heart
+                      onClick={() => imageLikeToggle(creation.id)}
+                      disabled={loading}
+                      className={`w-5 h-5 cursor-pointer hover:scale-110 transition ${creation.likes?.includes(user.id) ? 'fill-red-500 text-red-600' : 'text-white'
+                        }`}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
     </div>
   ) : (
-    <div className='flex-1 h-full flex flex-col gap-4 p-6'>
-      <Loader2 className='w-5 h-5 animate-spin' />
+    <div className='flex-1 h-full flex items-center justify-center p-6'>
+      <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
     </div>
   )
+
 }
 
 export default Community
