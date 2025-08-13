@@ -188,28 +188,56 @@ export const removeImageBackground = async (req, res) => {
 export const removeImageObject = async (req, res) => {
     try {
         const { userId } = req.auth();
-        console.log(userId);
+        console.log('User ID:', userId);
         const image = req.file;
         const { object } = req.body;
         const plan = req.plan;
+        const free_usage = req.free_usage;
 
-        if (plan !== 'premium') {
+        if (!image) {
+            return res.json({ success: false, message: 'No image file provided' })
+        }
+
+        if (!object) {
+            return res.json({ success: false, message: 'No object specified to remove' })
+        }
+
+        console.log('Image file:', {
+            originalname: image.originalname,
+            mimetype: image.mimetype,
+            size: image.size,
+            path: image.path
+        });
+        console.log('Object to remove:', object);
+
+        if (plan !== 'premium' && free_usage >= 10) {
             return res.json({ success: false, message: 'you have reached your limit , please upgrade your package to continue' })
         }
 
+        console.log('Uploading image to Cloudinary...');
         const { public_id } = await cloudinary.uploader.upload(image.path)
+        console.log('Image uploaded with public_id:', public_id);
 
         const imageurl = cloudinary.url(public_id, {
             transformation: [{ effect: `gen_remove:${object}` }],
             resource_type: 'image'
-
         })
+        console.log('Generated URL with object removal:', imageurl);
+        
         await sql`INSERT INTO creations (user_id,prompt,content,type)
         VALUES (${userId},${`Removed ${object} from image`},${imageurl},'image')`;
 
+        if (plan !== 'premium') {
+            await clerkClient.users.updateUserMetadata(userId, {
+                privateMetadata: {
+                    free_usage: free_usage + 1
+                }
+            })
+        }
+
         res.json({ success: true, content: imageurl })
     } catch (error) {
-        console.log(error.message)
+        console.error('Error in removeImageObject:', error);
         res.json({ success: false, message: error.message })
     }
 

@@ -19,38 +19,53 @@ function RemoveObject() {
     try {
       setLoading(true)
 
+      if (!input) {
+        toast.error('Please select an image file');
+        return;
+      }
+
+      if (!object.trim()) {
+        toast.error('Please enter an object name to remove');
+        return;
+      }
+
       if (object.split(' ').length > 1) {
         toast.error('Please enter a single object name')
-        setLoading(false)
         return
       }
+
+      console.log('Selected file:', input);
+      console.log('Object to remove:', object);
+
       const formData = new FormData();
       formData.append('image', input);
       formData.append('object', object);
 
-      const prompt = `Write an image of   ${input} in the style ${selectedStyle}`
+      console.log('FormData created, sending request...');
       const { data } = await axios.post('/api/ai/remove-image-object',
         formData, {
         headers: {
           Authorization: `Bearer ${await getToken()}`
         }
       });
-      console.log(data)
+      console.log('Response received:', data);
+      
       if (data.success) {
         setContent(data.content)
-        setLoading(false)
+        toast.success('Object removed successfully!');
       }
       else {
         toast.error(data.message);
         console.log(data.message);
-        setLoading(false)
       }
 
     } catch (error) {
-      toast.error(error.message);
+      console.error('API Error:', error);
+      console.error('Error response:', error.response);
+      toast.error(error.response?.data?.message || error.message || 'Something went wrong');
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
-
   }
 
   return (
@@ -66,7 +81,6 @@ function RemoveObject() {
         <p className='mt-6 text-sm font-medium'>Upload Image</p>
         <input
           onChange={(e) => setInput(e.target.files[0])}
-          value={input}
           type='file'
           accept='image/*'
           required
@@ -75,9 +89,11 @@ function RemoveObject() {
         <p className='mt-6 text-sm font-medium'>Describe object name to remove </p>
         <textarea
           rows={5}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e) => setObject(e.target.value)}
           value={object}
-          type='' className='w-full p-2 px-3 mt-2 outline-none text-sm rounded-md border border-gray-300' placeholder='only single  object name' required />
+          className='w-full p-2 px-3 mt-2 outline-none text-sm rounded-md border border-gray-300' 
+          placeholder='only single object name' 
+          required />
         <button
           disabled={loading}
           className='flex w-full p-2 mt-4 bg-gradient-to-r from-[#226BFF] to-[#65ADFF] text-white rounded-lg cursor-pointer  justify-center gap-2'>
@@ -100,11 +116,23 @@ function RemoveObject() {
           <div className='text-sm text-gray-600 flex-1 flex justify-center items-center'>
             <div className='text-sm flex flex-col items-center gap-5 text-gray-400'>
               <Scissors className='w-9 h-9' />
-              <p className='text-center'>Upload an aimage and click "Remove object" to get started!</p>
+              <p className='text-center'>Upload an image and click "Remove object" to get started!</p>
             </div>
           </div>
         ) : (
-          <img src={content} alt='content' className='w-full h-full object-contain' />
+          <div className='text-sm text-gray-600 flex-1 flex justify-center items-center'>
+            <div className='flex flex-col items-center gap-5'>
+              <img 
+                src={content} 
+                alt="Processed image" 
+                className="max-w-full max-h-80 object-contain rounded-lg shadow-md"
+                onError={(e) => {
+                  console.error('Image failed to load:', content);
+                  e.target.style.display = 'none';
+                }}
+              />
+            </div>
+          </div>
         )}
       </div>
     </div>
