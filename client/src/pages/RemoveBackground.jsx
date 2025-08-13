@@ -19,10 +19,19 @@ function RemoveBackground() {
     try {
       setLoading(true)
 
+      if (!input) {
+        toast.error('Please select an image file');
+        return;
+      }
+
+      console.log('Selected file:', input);
+      console.log('File size:', input.size);
+      console.log('File type:', input.type);
+
       const formData = new FormData();
       formData.append('image', input);
 
-      const prompt = `Write an image of   ${input} in the style ${selectedStyle}`
+      console.log('FormData created, sending request...');
       const { data } = await axios.post('/api/ai/remove-image-background',
         formData, {
         headers: {
@@ -32,18 +41,20 @@ function RemoveBackground() {
       console.log(data)
       if (data.success) {
         setContent(data.content)
-        setLoading(false)
+        toast.success('Background removed successfully!');
       }
       else {
         toast.error(data.message);
         console.log(data.message);
-        setLoading(false)
       }
 
     } catch (error) {
-      toast.error(error.message);
+      console.error('API Error:', error);
+      console.error('Error response:', error.response);
+      toast.error(error.response?.data?.message || error.message || 'Something went wrong');
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (
@@ -59,7 +70,6 @@ function RemoveBackground() {
         <p className='mt-6 text-sm font-medium'>Upload Image</p>
         <input
           onChange={(e) => setInput(e.target.files[0])}
-          value={input}
           type='file'
           accept='image/*'
           required
@@ -88,13 +98,21 @@ function RemoveBackground() {
           <div className='text-sm text-gray-600 flex-1 flex justify-center items-center'>
             <div className='text-sm flex flex-col items-center gap-5 text-gray-400'>
               <Eraser className='w-9 h-9' />
-              <p className='text-center'>Upload an aimage and click "Remove Background" to get started!</p>
+              <p className='text-center'>Upload an image and click "Remove Background" to get started!</p>
             </div>
           </div>
         ) : (
           <div className='text-sm text-gray-600 flex-1 flex justify-center items-center'>
-            <div className='reset-tw text-sm flex flex-col items-center gap-5 text-gray-400'>
-              {content}
+            <div className='flex flex-col items-center gap-5'>
+              <img 
+                src={content} 
+                alt="Processed image" 
+                className="max-w-full max-h-80 object-contain rounded-lg shadow-md"
+                onError={(e) => {
+                  console.error('Image failed to load:', content);
+                  e.target.style.display = 'none';
+                }}
+              />
             </div>
           </div>
         )}

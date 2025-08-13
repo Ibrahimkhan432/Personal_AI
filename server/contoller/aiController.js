@@ -134,29 +134,53 @@ export const generateImage = async (req, res) => {
 export const removeImageBackground = async (req, res) => {
     try {
         const { userId } = req.auth();
-        console.log(userId);
+        console.log('User ID:', userId);
         const image = req.file;
         const plan = req.plan;
+        const free_usage = req.free_usage;
 
-        if (plan !== 'premium') {
+        if (!image) {
+            return res.json({ success: false, message: 'No image file provided' })
+        }
+
+        console.log('Image file:', {
+            originalname: image.originalname,
+            mimetype: image.mimetype,
+            size: image.size,
+            path: image.path
+        });
+
+        if (plan !== 'premium' && free_usage >= 10) {
             return res.json({ success: false, message: 'you have reached your limit , please upgrade your package to continue' })
         }
 
-        const { secure_url } = await cloudinary.uploader.upload(image.path, {
+        // Upload image to Cloudinary
+        console.log('Uploading image to Cloudinary...');
+        const { public_id } = await cloudinary.uploader.upload(image.path);
+        console.log('Image uploaded with public_id:', public_id);
+        
+        // Use background removal transformation
+        const secure_url = cloudinary.url(public_id, {
             transformation: [
-                {
-                    effect: 'background-removal',
-                    background_removal: 'remove_the_background'
-                }
+                { effect: 'gen_remove:background' }
             ]
-        })
-        console.log(secure_url)
+        });
+        console.log('Generated URL with background removal:', secure_url);
+        
         await sql`INSERT INTO creations (user_id,prompt,content,type)
         VALUES (${userId},'Remove background from Image',${secure_url},'image')`;
 
+        if (plan !== 'premium') {
+            await clerkClient.users.updateUserMetadata(userId, {
+                privateMetadata: {
+                    free_usage: free_usage + 1
+                }
+            })
+        }
+
         res.json({ success: true, content: secure_url })
     } catch (error) {
-        console.log(error.message)
+        console.error('Error in removeImageBackground:', error);
         res.json({ success: false, message: error.message })
     }
 
