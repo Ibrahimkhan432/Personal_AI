@@ -99,7 +99,7 @@ export const generateImage = async (req, res) => {
     try {
         const { userId } = req.auth();
         console.log(userId);
-        const { prompt, publish } = req.body;
+        const { prompt } = req.body;
         const plan = req.plan;
 
         if (plan !== 'premium') {
@@ -121,8 +121,15 @@ export const generateImage = async (req, res) => {
 
         console.log(secure_url)
 
-        await sql`INSERT INTO creations (user_id,prompt,content,type,publish)
-        VALUES (${userId},${prompt},${secure_url},'image',${publish ?? false})`;
+        // Try to insert with publish column, fallback if it doesn't exist
+        try {
+            await sql`INSERT INTO creations (user_id,prompt,content,type,publish)
+            VALUES (${userId},${prompt},${secure_url},'image',true)`;
+        } catch (publishError) {
+            // If publish column doesn't exist, insert without it
+            await sql`INSERT INTO creations (user_id,prompt,content,type)
+            VALUES (${userId},${prompt},${secure_url},'image')`;
+        }
 
         res.json({ success: true, content: secure_url })
     } catch (error) {

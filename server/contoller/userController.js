@@ -12,7 +12,15 @@ export const getUserController = async (req, res) => {
 export const getPublishedCreations = async (req, res) => {
     try {
         const { userId } = req.auth();
-        const creations = await sql`SELECT * FROM creations WHERE publish = true ORDER BY created_at DESC`
+        // Try to get published creations, fallback to all images if publish column doesn't exist
+        let creations;
+        try {
+            creations = await sql`SELECT * FROM creations WHERE type = 'image' AND publish = true ORDER BY created_at DESC`
+        } catch (publishError) {
+            // If publish column doesn't exist, get all image creations
+            console.log('Publish column not found, showing all image creations');
+            creations = await sql`SELECT * FROM creations WHERE type = 'image' ORDER BY created_at DESC`
+        }
         res.json({ success: true, creations })
     } catch (error) {
         console.error('Error in getPublishedCreations:', error);
@@ -27,7 +35,9 @@ export const toggleLikeCreation = async (req, res) => {
         if (!creation) {
             return res.json({ success: false, message: "creation not found" })
         }
-        const currentLikes = creation.likes;
+        
+        // Handle null or undefined likes array
+        const currentLikes = creation.likes || [];
         const userIdStr = userId.toString();
         let updatedLikes;
         let message;
@@ -45,6 +55,7 @@ export const toggleLikeCreation = async (req, res) => {
         await sql`UPDATE creations SET likes =${formattedArray}::text[] WHERE id = ${id}`
         res.json({ success: true, message })
     } catch (error) {
+        console.error('Error in toggleLikeCreation:', error);
         res.json({ success: false, message: error.message })
     }
 }
