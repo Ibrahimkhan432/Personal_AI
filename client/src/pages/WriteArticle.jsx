@@ -32,18 +32,18 @@ function WriteArticle() {
       console.log(data)
       if (data.success) {
         setContent(data.content)
-        setLoading(false)
       }
       else {
         toast.error(data.message);
         console.log(data.message);
-        setLoading(false)
       }
 
     } catch (error) {
-      toast.error(error.message);
+      console.error('API Error:', error);
+      toast.error(error.response?.data?.message || error.message || 'Something went wrong');
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (

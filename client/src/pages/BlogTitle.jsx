@@ -1,4 +1,4 @@
-import { Edit, Hash, Sparkles } from 'lucide-react'
+import { Hash, Sparkles } from 'lucide-react'
 import React, { useState } from 'react';
 import Markdown from 'react-markdown';
 import axios from 'axios';
@@ -18,29 +18,30 @@ function BlogTitle() {
 
 
   const onSubmitHandler = async (e) => {
+    e.preventDefault();
     try {
       setLoading(true)
       const prompt = `Generate a blog title for the keyword ${input} in the category  ${selectedCategory}.`
-      const { data } = await axios.post('/api/ai/generate-blog-title', { prompt }, {
-        Headers: {
+      const { data } = await axios.post('/api/ai/generate-blogTitle', { prompt }, {
+        headers: {
           Authorization: `Bearer ${await getToken()}`
         }
       });
       console.log(data)
       if (data.success) {
         setContent(data.content)
-        setLoading(false)
       }
       else {
         toast.error(data.message);
         console.log(data.message);
-        setLoading(false)
       }
 
     } catch (error) {
-      toast.error(error.message);
+      console.error('API Error:', error);
+      toast.error(error.response?.data?.message || error.message || 'Something went wrong');
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (
