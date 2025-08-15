@@ -9,7 +9,6 @@ import { SquarePen, Hash, Image, Eraser, Scissors, FileText } from 'lucide-react
 import ai_gen_img_1 from "./ai_gen_img_1.png";
 import ai_gen_img_2 from "./ai_gen_img_2.png";
 import ai_gen_img_3 from "./ai_gen_img_3.png";
-import smart_work from "./smart_work.png";
 import images_emovebg_preview from "./images_removebg_preview.png";
 
 export const assets = {
@@ -20,7 +19,6 @@ export const assets = {
     star_dull_icon,
     profile_img_1,
     arrow_icon,
-    smart_work,
     images_emovebg_preview
 };
 
